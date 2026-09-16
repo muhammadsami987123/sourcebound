@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About · Sourcebound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3" />
+  <link rel="stylesheet" href="assets/css/marketing.css?v=3" />
+  <script>
+    window.APP_CONFIG = { BACKEND_URL: "http://127.0.0.1:8000" };
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("sourcebound:settings") || "{}");
+        if (s.theme && s.theme !== "system") document.documentElement.setAttribute("data-theme", s.theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="marketing-body" data-page="about">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="marketing-navbar">
+    <div class="marketing-container flex items-center justify-between h-16">
+      <a href="index.html" class="flex items-center gap-2.5 min-h-[44px]">
+        <span class="brand-mark w-9 h-9 text-sm">SB</span>
+        <span class="font-display font-semibold text-base" style="color:var(--ink-900)">Sourcebound</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1" aria-label="Primary">
+        <a href="index.html" class="marketing-nav-link" data-nav-key="home">Home</a>
+        <a href="features.html" class="marketing-nav-link" data-nav-key="features">Features</a>
+        <a href="features.html#how-it-works" class="marketing-nav-link" data-nav-key="how-it-works">How It Works</a>
+        <a href="about.html" class="marketing-nav-link" data-nav-key="about">About</a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-2">
+        <a href="app.html" class="btn btn-primary">
+          Get Started
+          <span data-icon="arrowRight" style="width:16px;height:16px"></span>
+        </a>
+      </div>
+
+      <button type="button" class="marketing-menu-btn md:hidden" data-marketing-menu-btn aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span data-icon="menu"></span>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="marketing-mobile-panel md:hidden" data-marketing-menu-panel hidden>
+      <nav class="marketing-container py-3 flex flex-col gap-1" aria-label="Mobile">
+        <a href="index.html" class="marketing-mobile-link" data-nav-key="home">Home</a>
+        <a href="features.html" class="marketing-mobile-link" data-nav-key="features">Features</a>
+        <a href="features.html#how-it-works" class="marketing-mobile-link" data-nav-key="how-it-works">How It Works</a>
+        <a href="about.html" class="marketing-mobile-link" data-nav-key="about">About</a>
+        <a href="app.html" class="btn btn-primary justify-center mt-2">Get Started</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="marketing-container py-16 md:py-20">
+      <span class="marketing-eyebrow">
+        <span data-icon="quote" style="width:14px;height:14px"></span>
+        About
+      </span>
+      <h1 class="font-display font-semibold text-4xl md:text-5xl mt-6 max-w-2xl" style="color:var(--ink-900)">
+        A compact, portfolio-quality RAG chatbot
+      </h1>
+      <p class="text-muted text-lg max-w-2xl mt-5">
+        Sourcebound lets you add a website URL or upload a document, then ask questions answered
+        strictly from that source's content — with references back to the exact chunks used. It's
+        built to be small, readable, and honest about what it does, rather than to look impressive
+        with infrastructure it doesn't need.
+      </p>
+    </section>
+
+    <section class="marketing-container pb-16 md:pb-20 grid md:grid-cols-2 gap-10">
+      <div class="marketing-card p-6 md:p-8">
+        <div class="marketing-icon-tile mb-4"><span data-icon="cpu"></span></div>
+        <h2 class="font-display font-semibold text-xl mb-3" style="color:var(--ink-900)">Technology stack</h2>
+        <ul class="text-muted text-sm space-y-2">
+          <li><span class="font-semibold" style="color:var(--ink-700)">Frontend —</span> HTML5, Tailwind CSS, vanilla JavaScript, Fetch API. No frontend framework, no build step.</li>
+          <li><span class="font-semibold" style="color:var(--ink-700)">Backend —</span> Python 3.11+, FastAPI, Uvicorn, Pydantic, the OpenAI Python SDK.</li>
+          <li><span class="font-semibold" style="color:var(--ink-700)">RAG —</span> website/document extraction, cleaning, chunking, OpenAI embeddings, NumPy cosine-similarity search, grounded answer generation.</li>
+          <li><span class="font-semibold" style="color:var(--ink-700)">Storage —</span> local JSON files plus NumPy embedding files on disk. No database, no Docker, no external vector store.</li>
+        </ul>
+      </div>
+      <div class="marketing-card p-6 md:p-8">
+        <div class="marketing-icon-tile mb-4"><span data-icon="shield"></span></div>
+        <h2 class="font-display font-semibold text-xl mb-3" style="color:var(--ink-900)">Design principles</h2>
+        <ul class="text-muted text-sm space-y-2">
+          <li>Answers are strictly grounded in retrieved chunks — never fabricated, with a clear "not found" response when the source doesn't cover it.</li>
+          <li>Every backend endpoint validates input and returns structured, honest errors instead of raw stack traces.</li>
+          <li>Uploaded filenames and URLs are treated as untrusted input and validated before use.</li>
+          <li>The interface only ever shows real backend data — no invented statistics, sources, or activity.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="marketing-container pb-16 md:pb-20">
+      <div class="marketing-card p-6 md:p-8">
+        <h2 class="font-display font-semibold text-xl mb-4" style="color:var(--ink-900)">Known scope &amp; limitations</h2>
+        <p class="text-muted text-sm mb-4">
+          Sourcebound is intentionally scoped for single-user, local, and portfolio use rather than
+          multi-tenant production deployment:
+        </p>
+        <ul class="text-muted text-sm space-y-2 list-disc pl-5">
+          <li>Local JSON/NumPy storage suits a single-user, single-machine, modest-scale deployment — not concurrent multi-writer production use.</li>
+          <li>No authentication or authorization; it's intended for local or personal use.</li>
+          <li>PDF extraction relies on embedded text — scanned or image-only PDFs are not OCR'd.</li>
+          <li>Conversation history is session/local-state based rather than a persisted multi-turn store.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="marketing-container pb-16 md:pb-24">
+      <div class="marketing-cta-band p-10 md:p-14 text-center">
+        <h2 class="font-display font-semibold text-3xl md:text-4xl mb-3">Try it with your own source</h2>
+        <p class="max-w-xl mx-auto mb-8" style="color:var(--brand-100)">
+          Open the workspace and add a website or document to get started.
+        </p>
+        <a href="app.html" class="btn text-base px-6 py-3" style="background:#fff;color:var(--brand-700)">
+          Open Workspace
+          <span data-icon="arrowRight" style="width:18px;height:18px"></span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="marketing-footer">
+    <div class="marketing-container py-12 grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="md:col-span-1">
+        <a href="index.html" class="flex items-center gap-2.5 mb-3">
+          <span class="brand-mark w-8 h-8 text-xs">SB</span>
+          <span class="font-display font-semibold" style="color:var(--ink-900)">Sourcebound</span>
+        </a>
+        <p class="text-muted text-sm">A compact, source-grounded RAG chatbot.</p>
+      </div>
+      <div>
+        <p class="marketing-footer-heading mb-3">Product</p>
+        <div class="flex flex-col items-start">
+          <a href="index.html" class="marketing-footer-link">Home</a>
+          <a href="features.html" class="marketing-footer-link">Features</a>
+          <a href="features.html#how-it-works" class="marketing-footer-link">How It Works</a>
+          <a href="about.html" class="marketing-footer-link">About</a>
+        </div>
+      </div>
+      <div>
+        <p class="marketing-footer-heading mb-3">Workspace</p>
+        <div class="flex flex-col items-start">
+          <a href="app.html" class="marketing-footer-link">Open Workspace</a>
+          <a href="sources.html" class="marketing-footer-link">Sources</a>
+          <a href="chat.html" class="marketing-footer-link">Chat</a>
+          <a href="settings.html" class="marketing-footer-link">Settings</a>
+        </div>
+      </div>
+      <div>
+        <p class="marketing-footer-heading mb-3">Project</p>
+        <div class="flex flex-col items-start">
+          <a href="https://github.com/muhammadsami987123/sourcebound" class="marketing-footer-link" target="_blank" rel="noopener noreferrer">GitHub repository</a>
+        </div>
+      </div>
+    </div>
+    <div class="marketing-container py-5 border-t border-subtle text-faint text-xs">
+      Sourcebound — a portfolio-quality Retrieval-Augmented Generation chatbot.
+    </div>
+  </footer>
+
+  <script src="assets/js/marketing.js?v=3"></script>
+</body>
+</html>

@@ -35,7 +35,7 @@ $backendJob = Start-Job -Name "backend" -ScriptBlock {
     & $py -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 } -ArgumentList $backendPython, $backendDir
 
-Write-Host "Starting frontend -> http://127.0.0.1:5500/dashboard.html" -ForegroundColor Cyan
+Write-Host "Starting frontend -> http://127.0.0.1:5500/index.html" -ForegroundColor Cyan
 $frontendJob = Start-Job -Name "frontend" -ScriptBlock {
     param($dir)
     Set-Location $dir

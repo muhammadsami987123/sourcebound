@@ -1,0 +1,225 @@
+/* ==========================================================================
+   Sourcebound — Marketing site styles
+   Public homepage / about / features pages. Built on top of styles.css
+   tokens (colour, radius, shadow) — no raw hex/rgba here. All selectors are
+   prefixed `marketing-` to stay out of the app design system's namespace.
+   ========================================================================== */
+
+.marketing-body {
+  background: var(--surface-canvas);
+}
+
+/* ---------- Navbar ---------- */
+.marketing-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.marketing-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.65rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink-500);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  touch-action: manipulation;
+}
+.marketing-nav-link:hover {
+  color: var(--ink-900);
+  background: var(--surface-sunken);
+}
+.marketing-nav-link.is-active {
+  color: var(--brand-700);
+  font-weight: 600;
+  background: var(--brand-50);
+}
+html[data-theme="dark"] .marketing-nav-link.is-active {
+  color: var(--brand-200);
+  background: var(--brand-900);
+}
+
+.marketing-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.65rem;
+  color: var(--ink-700);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  touch-action: manipulation;
+}
+.marketing-menu-btn:hover { background: var(--surface-sunken); }
+
+.marketing-mobile-panel {
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface);
+}
+.marketing-mobile-panel[hidden] { display: none; }
+
+.marketing-mobile-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.6rem 0.5rem;
+  border-radius: 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink-700);
+}
+.marketing-mobile-link:hover { background: var(--surface-sunken); }
+.marketing-mobile-link.is-active { color: var(--brand-700); background: var(--brand-50); }
+
+/* ---------- Hero ---------- */
+.marketing-hero {
+  position: relative;
+  overflow: hidden;
+}
+.marketing-hero-glow {
+  position: absolute;
+  inset: -10% -10% auto -10%;
+  height: 26rem;
+  background: radial-gradient(60% 60% at 50% 0%, var(--brand-100), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+html[data-theme="dark"] .marketing-hero-glow {
+  background: radial-gradient(60% 60% at 50% 0%, var(--brand-900), transparent 70%);
+  opacity: 0.55;
+}
+
+.marketing-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--brand-700);
+  background: var(--brand-50);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+}
+html[data-theme="dark"] .marketing-eyebrow { color: var(--brand-200); background: var(--brand-900); }
+
+/* ---------- Sections & cards ---------- */
+.marketing-section-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-600);
+}
+
+.marketing-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.marketing-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.marketing-icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.7rem;
+  background: var(--brand-50);
+  color: var(--brand-700);
+  flex: none;
+}
+html[data-theme="dark"] .marketing-icon-tile { background: var(--brand-900); color: var(--brand-200); }
+
+/* ---------- Step / pipeline list ---------- */
+.marketing-step {
+  position: relative;
+  padding-left: 3.25rem;
+}
+.marketing-step-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Lexend", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  background: var(--brand-600);
+  color: #fff;
+  flex: none;
+}
+.marketing-step-connector {
+  position: absolute;
+  left: 1.25rem;
+  top: 2.5rem;
+  bottom: -1.5rem;
+  width: 1px;
+  background: var(--border-strong);
+}
+
+/* ---------- CTA band ---------- */
+.marketing-cta-band {
+  background: linear-gradient(135deg, var(--brand-600), var(--brand-800));
+  border-radius: 1.25rem;
+  color: #fff;
+}
+
+/* ---------- Footer ---------- */
+.marketing-footer {
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface);
+}
+.marketing-footer-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink-500);
+  font-size: 0.875rem;
+  transition: color 0.15s ease;
+}
+.marketing-footer-link:hover { color: var(--brand-700); }
+.marketing-footer-heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+
+/* ---------- Utility ---------- */
+.marketing-container {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 640px) {
+  .marketing-container { padding-inline: 1.5rem; }
+}
+
+@media (pointer: coarse) {
+  .marketing-nav-link,
+  .marketing-mobile-link,
+  .marketing-footer-link {
+    min-height: 44px;
+  }
+}

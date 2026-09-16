@@ -1,981 +1,612 @@
-# SOURCEBOUND PROJECT PROMPT
+I want to completely redesign the UI/UX of this project while keeping the existing backend, RAG functionality, source indexing, chat functionality, and all working features intact.
 
-## Project Title
+The current UI is too basic and feels like an unfinished internal dashboard. I want this to look and feel like a polished, modern, production-grade SaaS product.
 
-**Sourcebound — Professional Website and Document Chatbot**
+Use the existing project structure and codebase. First inspect the entire frontend and understand the current routing, components, state management, API integration, chat flow, source management, and existing functionality. Then implement the redesign properly instead of creating disconnected mock screens.
 
-## Project Objective
+## 1. Public Homepage Must Be the Default Route
 
-Build a compact, professional, and fully functional **Retrieval-Augmented Generation (RAG) chatbot**.
+Currently, opening the project directly takes me to the dashboard.
 
-Users should be able to:
+Change this.
 
-1. Add a public website URL.
-2. Upload a local document.
-3. Extract and process the source content.
-4. Store the processed knowledge in the application.
-5. Ask questions about the selected source.
-6. Receive accurate, source-grounded answers with relevant references.
+When the application is opened at the main URL, it should first show a proper **public homepage**.
 
-The chatbot must answer questions using the retrieved content from the uploaded document or website. If the required information is not available in the source, the system must clearly state that it could not find the answer instead of inventing information.
+The homepage should include:
 
-This project should remain **small and manageable**, but its validation, RAG pipeline, UI quality, and system design must be implemented professionally.
+* Professional navbar
+* Brand/logo
+* Home
+* Features
+* How It Works
+* About
+* Sources / Knowledge Base
+* Chat / Get Started CTA
+* Settings or appropriate navigation where relevant
+* Responsive mobile navigation
+* Professional hero section
+* Clear product description
+* RAG/source-grounded AI explanation
+* Feature sections
+* How the system works
+* Source/document ingestion explanation
+* Chat/answer/reference explanation
+* Professional CTA section
+* Footer
+* Proper links to all public pages
 
----
+The homepage should feel like a real SaaS product website, not an admin dashboard.
 
-# 1. Technology Stack
+Do not simply move the existing dashboard onto the homepage.
 
-## Frontend
+Create a proper marketing/product website experience.
 
-Use:
+## 2. Proper Application Entry Flow
 
-* HTML5
-* Tailwind CSS
-* Vanilla JavaScript
-* Fetch API
-* Browser localStorage where appropriate
+The structure should be approximately:
 
-Do **not** use:
+Public Website
+→ Homepage
+→ About
+→ Features / How It Works
+→ Get Started / Open Workspace
+→ Application Dashboard
 
-* React
-* Next.js
-* Vue
-* Angular
-* Any frontend framework
+The dashboard should be treated as the actual authenticated/workspace application.
 
-## Backend
+The root URL should NOT automatically open the dashboard.
 
-Use:
+The user should intentionally enter the application through something like:
 
-* Python 3.11+
-* FastAPI
-* Uvicorn
-* Pydantic
-* Python `venv`
-* OpenAI Python SDK
-* `python-dotenv`
+**Get Started**
+or
+**Open Workspace**
+or
+**Start Chat**
 
-## RAG Components
+Use the existing routing architecture where possible instead of unnecessarily rewriting the whole application.
 
-Use:
+## 3. Completely Redesign the Application Sidebar
 
-* Website content extraction
-* Local document text extraction
-* Text cleaning
-* Text chunking
-* Embeddings
-* Vector similarity search
-* Context-aware answer generation
-* Source references
+The current sidebar is too small and only contains a few options such as:
 
-For a lightweight implementation, use a simple local vector-storage approach such as:
+* Dashboard
+* Sources
+* Chat
+* Settings
 
-* JSON-based metadata storage
-* NumPy-based vector storage
-* Local files for persisted source data
+This feels incomplete.
 
-Do not add unnecessary infrastructure.
+Create a much more professional application navigation system.
 
-Avoid:
+The sidebar should contain logically grouped options such as:
 
-* React
-* Next.js
-* PostgreSQL
-* Redis
-* Docker
-* Kubernetes
-* Microservices
-* Complex authentication
-* External vector databases
-* Complex deployment infrastructure
+### Workspace
 
----
+* Overview / Dashboard
+* Chat
+* Sources
+* Documents
+* Websites
+* Search
+* Collections / Knowledge Base
 
-# 2. AI Model
+### Management
 
-Use:
+* Upload
+* Activity / Indexing
+* History
+* Analytics
 
-* **Chat model:** `gpt-4.1-mini`
-* **Embedding model:** `text-embedding-3-small`
+### Configuration
 
-The model names must be configurable through environment variables.
+* Settings
+* AI / Model Settings
+* Retrieval Settings
+* Integrations
 
-Create a `.env.example` file:
+### Account
 
-```env
-OPENAI_API_KEY=your_api_key_here
-OPENAI_CHAT_MODEL=gpt-4.1-mini
-OPENAI_EMBEDDING_MODEL=text-embedding-3-small
-BACKEND_URL=http://127.0.0.1:8000
-```
+* Profile
+* Preferences
+* Help / Documentation
 
-Never expose the API key in frontend code.
+Do not blindly add unnecessary pages if the backend does not support them.
 
----
+For pages that are not currently implemented, create a clean UI structure that clearly communicates the section without pretending that backend functionality exists.
 
-# 3. Core Features
+The sidebar should support:
 
-## 3.1 Source Management
+* Icons
+* Active state
+* Hover state
+* Tooltips when collapsed
+* Expand/collapse behavior
+* Proper spacing
+* Section labels
+* Responsive behavior
+* Mobile drawer navigation
+* Workspace/brand area
+* User/profile area
 
-Users must be able to add knowledge sources through:
+The sidebar should look like a modern AI SaaS application.
 
-* Website URL
-* PDF document
-* TXT document
-* Markdown document
+## 4. Add a Proper Global Search
 
-Optional support may be added for DOCX if it does not unnecessarily increase complexity.
+Add a professional search experience to the application header.
 
-Each source should include:
+The search should allow the user to search across relevant knowledge-base content where the existing backend supports it.
 
-* Unique source ID
-* Source name
-* Source type
-* Original URL or filename
-* Upload date
-* Processing status
-* Number of extracted characters
-* Number of generated chunks
-* Processing error, if any
-
-Supported source statuses:
-
-* Pending
-* Processing
-* Ready
-* Failed
-
-The interface must clearly display the current status of every source.
-
----
-
-## 3.2 Website URL Ingestion
-
-When a user submits a website URL:
-
-1. Validate the URL.
-2. Allow only `http` and `https`.
-3. Reject malformed URLs.
-4. Fetch the webpage from the backend.
-5. Extract readable text from the HTML.
-6. Remove unnecessary elements such as:
-
-   * Scripts
-   * Styles
-   * Navigation clutter
-   * Footer clutter
-   * Repeated whitespace
-7. Verify that meaningful text was extracted.
-8. Split the text into chunks.
-9. Generate embeddings for each chunk.
-10. Store the source metadata, chunks, and embeddings.
-11. Mark the source as ready.
-
-The backend must handle:
-
-* Invalid URLs
-* Unreachable websites
-* Request timeouts
-* Empty pages
-* Unsupported content types
-* Excessively large pages
-* Network failures
-* Duplicate URLs
-
-Do not allow arbitrary unsafe protocols such as:
-
-* `file://`
-* `javascript:`
-* `ftp://`
-
----
-
-## 3.3 Local Document Upload
-
-Allow users to upload supported files through a professional upload interface.
-
-Supported formats:
-
-* `.pdf`
-* `.txt`
-* `.md`
-
-The backend must:
-
-1. Validate the file extension.
-2. Validate the MIME type where available.
-3. Enforce a reasonable file-size limit.
-4. Extract text.
-5. Reject empty or unreadable files.
-6. Clean the extracted text.
-7. Split the text into chunks.
-8. Generate embeddings.
-9. Store the source and chunk information.
-10. Return a clear processing result.
-
-The frontend must show:
-
-* Selected filename
-* File type
-* File size
-* Upload progress or processing state
-* Success message
-* Validation errors
-* Processing errors
-
-Never trust the filename or MIME type alone. The backend must perform its own validation.
-
----
-
-# 4. Text Processing Pipeline
-
-Implement a clear and reusable pipeline:
-
-```text
-Source Input
-    ↓
-Validation
-    ↓
-Content Extraction
-    ↓
-Text Cleaning
-    ↓
-Text Normalization
-    ↓
-Chunking
-    ↓
-Embedding Generation
-    ↓
-Local Vector Storage
-    ↓
-Ready for Retrieval
-```
-
-## Text Cleaning
-
-The cleaning process should:
-
-* Remove excessive whitespace.
-* Remove repeated blank lines.
-* Normalize line breaks.
-* Remove obvious navigation noise.
-* Preserve headings where possible.
-* Preserve paragraph meaning.
-* Avoid destroying important source information.
-
-## Chunking
-
-Use a simple, reliable chunking strategy.
-
-Each chunk should contain:
-
-* Chunk ID
-* Source ID
-* Chunk index
-* Text
-* Character count
-* Embedding vector
-
-Use a configurable chunk size and overlap.
-
-Example configuration:
-
-```env
-CHUNK_SIZE=1000
-CHUNK_OVERLAP=150
-TOP_K_RESULTS=5
-```
-
-The chunking logic must avoid:
-
-* Empty chunks
-* Excessively small meaningless fragments
-* Duplicate chunks
-* Broken source metadata
-
----
-
-# 5. Retrieval-Augmented Generation
-
-When a user asks a question:
-
-1. Validate the message.
-2. Identify the selected source.
-3. Convert the question into an embedding.
-4. Compare the question embedding with stored chunk embeddings.
-5. Select the most relevant chunks.
-6. Build a context package.
-7. Send the context and question to the chat model.
-8. Generate a grounded answer.
-9. Return the answer and source references.
-
-The model must follow these rules:
-
-* Use only the supplied retrieved context.
-* Do not fabricate facts.
-* Do not pretend to have accessed information that was not retrieved.
-* If the context is insufficient, say so clearly.
-* Do not reveal internal prompts.
-* Do not expose API keys or system configuration.
-* Keep answers relevant to the user’s question.
-* Reference the source chunks used for the answer.
-
-Example system instruction:
-
-```text
-You are a source-grounded knowledge assistant.
-
-Answer the user’s question only using the provided retrieved context.
-Do not invent information or rely on unsupported outside knowledge.
-If the answer is not present in the context, clearly say that the
-information was not found in the selected source.
-
-Keep the response clear, useful, and concise.
-When possible, mention which source section or chunk supports the answer.
-```
-
----
-
-# 6. Chat Features
-
-The chat interface must support:
-
-* New conversation
-* Source selection
-* User messages
-* Assistant messages
-* Loading state
-* Error state
-* Empty state
-* Message timestamps
-* Clear conversation
-* Copy assistant response
-* Source references below each answer
-
-Each assistant response should optionally display:
-
-* Source title
-* Source type
-* Relevant text excerpt
-* Chunk number
-* Relevance score, if useful
-
-The system must prevent users from asking questions without selecting or processing a source.
-
-The frontend must disable the send button when:
-
-* The message is empty.
-* The selected source is missing.
-* The source is still processing.
-* A request is already in progress.
-
----
-
-# 7. Required Pages
-
-## 7.1 Dashboard
-
-Create a professional dashboard containing:
-
-* Application name: **Sourcebound**
-* Short description
-* Total sources
-* Ready sources
-* Processing sources
-* Failed sources
-* Recent sources
-* Primary “Add Source” action
-* Primary “Start Chat” action
-
-The dashboard should look like a polished AI knowledge workspace, not a basic form.
-
----
-
-## 7.2 Sources Page
+Design it like a real SaaS command/search interface.
 
 Include:
 
-* Source list
+* Search icon
+* Search input
+* Keyboard shortcut such as `/` or `Ctrl/Cmd + K`
+* Search results
+* Recent searches where appropriate
+* Empty state
+* Loading state
+* No-results state
+
+Do not add fake search results.
+
+Connect it to existing functionality where possible.
+
+## 5. Source Upload Must Open a Centered Modal
+
+This is very important.
+
+When the user clicks:
+
+**Add Source**
+or
+**Upload Source**
+
+DO NOT navigate to another ugly/basic page.
+
+Instead, open a professional centered modal/dialog.
+
+The modal should contain two clear source options:
+
+### Website URL
+
+A proper URL input:
+
+`https://example.com`
+
+Include:
+
+* URL input
+* URL validation
+* Clear label
+* Helpful description
+* Submit/Add Website button
+* Loading state
+* Error state
+* Success state
+
+### Document Upload
+
+Provide a proper drag-and-drop upload area.
+
+For example:
+
+**Drag & drop your document here**
+
+or
+
+**Browse files**
+
+Support the document formats that the existing backend already supports.
+
+Show:
+
+* Selected filename
+* File size
+* File type
+* Upload progress/loading state
+* Remove file option
+* Upload button
+* Error handling
+* Success state
+
+The modal should look polished and compact.
+
+The user should be able to choose between:
+
+**Website**
+and
+**Document**
+
+without leaving the current page.
+
+Clicking outside the modal or pressing Escape should close it.
+
+The modal must be hidden by default.
+
+## 6. Sources Page Redesign
+
+Completely redesign the Sources page.
+
+It should provide a professional knowledge-base management interface.
+
+Include:
+
+* Page title
+* Description
+* Add Source button
 * Search sources
-* Filter by source type
-* Filter by processing status
-* Add URL form
-* Upload document form
-* Source cards or table
+* Filters
+* Source type filter
+* Status filter
+* Sort options
+* Source cards/table
+* Website sources
+* Document sources
+* Processing state
+* Ready state
+* Failed state
 * Source metadata
-* Processing status
-* Delete source action
-* Open chat action
+* Last indexed time
+* Actions menu
 
-Each source item should clearly communicate whether it is ready for use.
+Each source should clearly communicate its status.
+
+For example:
+
+**Ready**
+**Processing**
+**Failed**
+
+Do not use excessive cards if a table/list would provide a cleaner experience.
+
+Use the layout that makes the most sense for managing many sources.
+
+## 7. Dashboard Redesign
+
+The current dashboard shown in the screenshot is too empty and basic.
+
+Redesign it into a useful workspace overview.
+
+Include useful metrics based on actual backend data:
+
+* Total Sources
+* Ready Sources
+* Processing
+* Failed
+* Documents
+* Websites
+* Recent Activity
+
+Also include:
+
+* Recent sources
+* Recent searches/questions
+* Indexing activity
+* Quick actions
+* Start Chat
+* Add Source
+* Upload Document
+
+Do not invent fake statistics.
+
+If the actual value is zero, show zero.
+
+## 8. Chat Page Must Be Completely Different
+
+This is extremely important.
+
+When the user enters the Chat page, it should feel like a dedicated AI chat application.
+
+The normal application sidebar should NOT remain visible if it makes the chat area unnecessarily constrained.
+
+The Chat page should use the available screen width properly.
+
+The layout should be:
 
 ---
 
-## 7.3 Source Details Page
+## Top Chat Header
 
-Display:
+```
+          Chat Conversation
 
-* Source title
-* Source type
-* Original URL or filename
-* Processing status
-* Creation date
-* Number of chunks
-* Extracted text preview
-* Chunk preview
-* Processing errors, if present
-* “Chat with this source” action
-* Delete source action
+   User message
 
-Do not display raw embeddings directly to normal users.
+   AI answer
+
+   Sources button
+```
 
 ---
 
-## 7.4 Chat Page
+```
+          Message Composer
+```
 
-Create the main RAG conversation interface with:
+---
 
-* Source selector
-* Conversation header
-* Message history
-* User message bubbles
-* Assistant response cards
-* Retrieved source references
-* Message input
+Do not keep unnecessary dashboard cards, navigation panels, metrics, or unrelated UI elements around the conversation.
+
+The chat experience should be clean and focused.
+
+## 9. Chat Answer Loading / Thinking Experience
+
+When the user asks a question, do not immediately show an empty response area.
+
+Show a polished AI processing experience.
+
+For example:
+
+**Thinking…**
+
+and, when source retrieval is actually happening:
+
+**Searching your sources…**
+
+The loading state should be animated but subtle.
+
+Important:
+
+The loading indicators must represent the actual state.
+
+Once the answer is completely generated:
+
+* Remove "Thinking…"
+* Remove "Searching your sources…"
+* Display the final answer
+* Display the Sources button if sources were actually used
+
+Never leave a loading indicator visible after the response has completed.
+
+## 10. Sources Button Under AI Answer
+
+Do NOT display a large list of source references directly underneath every answer.
+
+The chat should remain clean.
+
+If sources exist, show only something like:
+
+**[ Sources (5) ]**
+
+The source details should remain hidden.
+
+When the user clicks the Sources button:
+
+→ Open a centered professional modal.
+
+The modal should show:
+
+**Sources (5)**
+
+Then list every source used for that specific answer.
+
+Each source can include:
+
+* Source title/name
+* Website/document type
+* Relevant metadata
+* Reference information
+* Link if available
+* Any useful citation details already provided by the backend
+
+The modal should be scrollable if there are many sources.
+
+When the user closes the modal:
+
+→ Return to the exact same chat state.
+
+The Sources modal must NEVER automatically open.
+
+Default state must be:
+
+`isSourcesModalOpen = false`
+
+Only the user's explicit click on the Sources button can open it.
+
+## 11. Chat Composer
+
+Create a professional message composer at the bottom.
+
+Include:
+
+* Large input area
 * Send button
-* Clear chat action
-* Loading indicator
-* Error feedback
-* Empty state explaining how to begin
+* Enter to send
+* Shift + Enter for newline
+* Attachment/source-related action if supported
+* Disabled state while appropriate
+* Loading state
+* Proper error handling
 
-The chat page must be responsive and usable on desktop, tablet, and mobile.
+The composer should remain visually anchored near the bottom of the viewport.
 
----
+The conversation area should scroll independently.
 
-## 7.5 Settings Page
+## 12. Chat Empty State
 
-Include lightweight settings such as:
+Before the first question, do not show unnecessary dashboard content.
 
-* Theme preference
-* Chat response style
-* Number of retrieved chunks
-* Clear local application data
-* Backend connection status
-* Application version
+Show a clean chat welcome state.
 
-Do not add unnecessary account or enterprise settings.
+For example:
 
----
+**Ask your knowledge base anything**
 
-# 8. Frontend Design Requirements
+Then provide a few useful suggestion prompts based on the application's purpose.
 
-The UI must be **100% professional, clean, modern, and responsive**.
+Example:
 
-Design direction:
+* "Summarize the main topics in my sources"
+* "What does my knowledge base say about..."
+* "Find information about..."
 
-* Light professional interface
-* White and soft-neutral surfaces
-* Subtle borders
+These should be suggestions, not fake conversations.
+
+## 13. Responsive Design
+
+The entire redesign must be responsive.
+
+Desktop:
+
+* Proper sidebar
+* Full workspace
+* Clean content width
+* Professional spacing
+
+Tablet:
+
+* Collapsible sidebar
+* Responsive content
+
+Mobile:
+
+* Sidebar becomes a drawer
+* Proper mobile header
+* Full-width chat
+* Responsive modal
+* Touch-friendly controls
+* No horizontal overflow
+
+The UI must feel intentionally designed for mobile, not simply shrink the desktop layout.
+
+## 14. Visual Design Direction
+
+The design should feel like a modern AI/SaaS product.
+
+Use:
+
+* Clean typography
+* Strong visual hierarchy
 * Consistent spacing
-* Professional typography
-* Purple accent color
-* Rounded cards
-* Clear visual hierarchy
-* Minimal but meaningful animations
-* Strong empty states
-* Consistent buttons and form controls
-* Responsive navigation
-* Accessible focus states
+* Professional cards
+* Subtle borders
+* Soft shadows where appropriate
+* Clean icons
+* Smooth transitions
+* Proper hover states
+* Proper focus states
+* Consistent button styles
+* Consistent radius system
+* Professional empty states
+* Professional loading states
 
 Avoid:
 
-* Amateur-looking layouts
 * Excessive gradients
-* Overuse of emojis
-* Cluttered dashboards
 * Random colors
-* Excessive shadows
+* Oversized cards
+* Cluttered dashboards
+* Too many borders
 * Unnecessary animations
-* Fake metrics
-* Placeholder content presented as real data
-
-Use a consistent application shell with:
+* Generic template-looking UI
+* Huge amounts of empty space
+* Fake statistics
+* Fake functionality
 
-* Sidebar or responsive navigation
-* Top header
-* Page title
-* Breadcrumb or contextual navigation
-* Main content area
-* Reusable notification area
+The existing purple/white visual identity can be retained if it fits the current product, but refine it into a much more premium and consistent design system.
 
----
+## 15. Important Functional Rule
 
-# 9. Required Frontend Components
+This is a UI/UX redesign, NOT a request to break or replace the existing functionality.
 
-Create reusable Vanilla JavaScript components or rendering functions for:
+Before making changes:
 
-* Navigation
-* Page layout
-* Source card
-* Source status badge
-* URL input form
-* File upload form
-* Chat message
-* Source reference
-* Loading indicator
-* Empty state
-* Error alert
-* Confirmation modal
-* Toast notification
-* Statistics card
-* Search and filter controls
+1. Inspect the entire existing frontend.
+2. Identify all existing routes.
+3. Identify all API calls.
+4. Identify source ingestion logic.
+5. Identify document upload logic.
+6. Identify website indexing logic.
+7. Identify RAG retrieval logic.
+8. Identify chat streaming/state logic.
+9. Identify source citation/reference logic.
+10. Identify existing modal/state logic.
 
-Do not duplicate the same UI logic across multiple pages.
+Then redesign the interface around the existing functionality.
 
----
+Do not replace working backend functionality with mock data.
 
-# 10. Backend API
+Do not remove existing API integrations.
 
-Implement the following endpoints.
+Do not rewrite working RAG logic unnecessarily.
 
-## Health
+Do not create duplicate implementations of existing features.
 
-```http
-GET /api/health
-```
+## 16. Routing Structure
 
-Returns backend status and application information.
+Create a clean routing structure similar to:
 
-## Sources
+`/`
+→ Public Homepage
 
-```http
-GET /api/sources
-POST /api/sources/url
-POST /api/sources/upload
-GET /api/sources/{source_id}
-DELETE /api/sources/{source_id}
-```
+`/about`
+→ About
 
-## Source Processing
+`/features`
+→ Features / How It Works
 
-```http
-GET /api/sources/{source_id}/status
-GET /api/sources/{source_id}/chunks
-```
+`/app`
+→ Application Dashboard
 
-## Chat
+`/app/sources`
+→ Sources
 
-```http
-POST /api/chat
-```
+`/app/chat`
+→ Dedicated Chat
 
-Example request:
+`/app/search`
+→ Search
 
-```json
-{
-  "source_id": "source_123",
-  "message": "What is this website about?",
-  "conversation_id": "conversation_123"
-}
-```
+`/app/settings`
+→ Settings
 
-Example response:
+Use the project's existing routing approach if it already has one.
 
-```json
-{
-  "answer": "The website explains...",
-  "source_id": "source_123",
-  "references": [
-    {
-      "chunk_id": "chunk_001",
-      "source_title": "Example Website",
-      "excerpt": "Relevant source text..."
-    }
-  ]
-}
-```
+The exact routes can be adjusted to fit the existing architecture.
 
-All request and response bodies must be validated with Pydantic models.
+## 17. Final Quality Requirement
 
----
+Do not just make individual pages look better.
 
-# 11. Validation Requirements
+I want the entire product experience to feel connected.
 
-Validation must be implemented on both frontend and backend.
+The user journey should be:
 
-## URL Validation
+**Open website**
+→ Beautiful homepage
+→ Understand what Sourcebound does
+→ Click Get Started
+→ Enter application
+→ See professional workspace
+→ Add a website/document
+→ Source gets indexed
+→ Open Chat
+→ Ask a question
+→ See proper thinking/searching state
+→ Receive answer
+→ See one Sources button
+→ Click Sources
+→ Review sources in a clean popup
+→ Close popup
+→ Continue chatting
 
-Validate:
+Every transition should feel intentional and polished.
 
-* Required value
-* Valid URL structure
-* HTTP or HTTPS protocol
-* No unsupported protocol
-* Reasonable URL length
-* Duplicate source handling
+Use the uploaded screenshot as a reference for the current UI, but treat it as the **starting point that needs a substantial redesign**, not as the final design to preserve.
 
-## File Validation
+Before finishing, test the complete flow and make sure there are no UI state bugs, especially:
 
-Validate:
-
-* File presence
-* Allowed extension
-* MIME type
-* File size
-* Empty files
-* Corrupted files
-* Unsupported formats
-
-## Chat Validation
-
-Validate:
-
-* Required source ID
-* Required message
-* Maximum message length
-* Source existence
-* Source readiness
-* Valid conversation ID when provided
-
-## API Validation
-
-Every endpoint must return clear structured errors.
-
-Use appropriate HTTP status codes, including:
-
-* `400` for invalid input
-* `404` for missing sources
-* `413` for files that are too large
-* `422` for validation errors
-* `500` for unexpected server errors
-
-Never expose raw stack traces to the frontend.
-
----
-
-# 12. Storage Requirements
-
-Use lightweight local persistence.
-
-Store:
-
-* Source metadata
-* Extracted text
-* Chunks
-* Embeddings
-* Conversation metadata, if needed
-
-Suggested structure:
-
-```text
-data/
-├── sources.json
-├── chunks.json
-├── embeddings/
-└── uploads/
-```
-
-The application must:
-
-* Create required directories automatically.
-* Handle missing storage files safely.
-* Avoid corrupting JSON files.
-* Use atomic writes where practical.
-* Prevent duplicate source records.
-* Keep source IDs stable.
-* Delete related chunks and embeddings when a source is deleted.
-
-Do not use a database for this compact project.
-
----
-
-# 13. Suggested Project Structure
-
-```text
-sourcebound/
-│
-├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── config.py
-│   │   ├── schemas/
-│   │   │   ├── source.py
-│   │   │   ├── chat.py
-│   │   │   └── common.py
-│   │   ├── routes/
-│   │   │   ├── health.py
-│   │   │   ├── sources.py
-│   │   │   └── chat.py
-│   │   ├── services/
-│   │   │   ├── url_loader.py
-│   │   │   ├── document_loader.py
-│   │   │   ├── text_cleaner.py
-│   │   │   ├── chunker.py
-│   │   │   ├── embeddings.py
-│   │   │   ├── retriever.py
-│   │   │   ├── rag_service.py
-│   │   │   └── storage.py
-│   │   └── utils/
-│   │       ├── validation.py
-│   │       └── errors.py
-│   ├── data/
-│   ├── uploads/
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── frontend/
-│   ├── index.html
-│   ├── dashboard.html
-│   ├── sources.html
-│   ├── source-details.html
-│   ├── chat.html
-│   ├── settings.html
-│   ├── assets/
-│   │   ├── css/
-│   │   │   └── styles.css
-│   │   └── js/
-│   │       ├── api.js
-│   │       ├── app.js
-│   │       ├── navigation.js
-│   │       ├── sources.js
-│   │       ├── chat.js
-│   │       ├── settings.js
-│   │       └── components.js
-│   └── README.md
-│
-├── tests/
-│   ├── test_validation.py
-│   ├── test_chunking.py
-│   ├── test_storage.py
-│   ├── test_retrieval.py
-│   └── test_api.py
-│
-├── README.md
-└── .gitignore
-```
-
----
-
-# 14. Error and Loading States
-
-Every asynchronous operation must have:
-
-* Initial state
-* Loading state
-* Success state
-* Empty state
-* Validation error state
-* Network error state
-* Backend error state
-
-Examples:
-
-* “Processing website content…”
-* “Extracting document text…”
-* “Generating knowledge embeddings…”
-* “Source is ready for chat.”
-* “This document contains no readable text.”
-* “The website could not be reached.”
-* “No relevant information was found in this source.”
-
-Do not leave users with blank screens or unexplained failures.
-
----
-
-# 15. Security Requirements
-
-Implement basic security protections:
-
-* Keep API keys on the backend only.
-* Validate all incoming data.
-* Restrict accepted URL protocols.
-* Apply request timeouts.
-* Limit URL content size.
-* Limit uploaded file size.
-* Sanitize extracted HTML.
-* Do not render untrusted HTML directly.
-* Escape user-generated text in the frontend.
-* Avoid exposing filesystem paths.
-* Avoid exposing internal exception details.
-* Prevent path traversal through uploaded filenames.
-* Use generated safe filenames for stored uploads.
-
----
-
-# 16. Testing Requirements
-
-Write tests for:
-
-## Validation
-
-* Valid URL
-* Invalid URL
-* Unsupported protocol
-* Empty URL
-* Oversized URL
-* Valid file
-* Unsupported file
-* Empty file
-* Oversized file
-* Empty chat message
-* Excessively long chat message
-
-## Text Processing
-
-* HTML text extraction
-* Text cleaning
-* Chunk creation
-* Chunk overlap
-* Empty content handling
-* Duplicate chunk prevention
-
-## Storage
-
-* Save source
-* Load sources
-* Update status
-* Save chunks
-* Delete source and related chunks
-* Missing storage file handling
-
-## Retrieval
-
-* Embedding creation
-* Similarity ranking
-* Top-k retrieval
-* No-result handling
-
-## API
-
-* Health endpoint
-* URL ingestion
-* File upload
-* Source listing
-* Source deletion
-* Chat request
-* Invalid source handling
-* Unready source handling
-
-Use mocked AI calls in tests. Do not require a real OpenAI API key to run the test suite.
-
----
-
-# 17. README Requirements
-
-The README must explain:
-
-* Project overview
-* Main features
-* Technology stack
-* RAG workflow
-* Project structure
-* Environment setup
-* Installation commands
-* How to run the backend
-* How to run the frontend
-* Supported file formats
-* API endpoints
-* Validation rules
-* Testing commands
-* Known limitations
-* Future improvements
-
-Include setup instructions for Windows and standard terminal usage.
-
----
-
-# 18. Development Milestones
-
-## Milestone 1 — Project Setup
-
-* Create frontend and backend structure.
-* Configure FastAPI.
-* Configure Tailwind CSS.
-* Add environment configuration.
-* Add health endpoint.
-* Create professional application shell.
-
-## Milestone 2 — Source Management
-
-* Implement URL validation.
-* Implement file validation.
-* Add source storage.
-* Build source management UI.
-* Add source status handling.
-
-## Milestone 3 — Content Processing
-
-* Implement website extraction.
-* Implement PDF, TXT, and Markdown extraction.
-* Implement text cleaning.
-* Implement chunking.
-* Add processing errors.
-
-## Milestone 4 — RAG Pipeline
-
-* Implement embeddings.
-* Implement local vector storage.
-* Implement similarity retrieval.
-* Implement context construction.
-* Implement grounded answer generation.
-
-## Milestone 5 — Chat Experience
-
-* Build chat page.
-* Add source selection.
-* Add message history.
-* Add loading and error states.
-* Add source references.
-* Add clear conversation functionality.
-
-## Milestone 6 — Quality and Testing
-
-* Add API tests.
-* Add validation tests.
-* Add retrieval tests.
-* Improve responsive design.
-* Improve accessibility.
-* Complete README.
-* Test the complete user journey.
-
----
-
-# 19. Final Acceptance Criteria
-
-The project is complete only when:
-
-* The frontend does not use React or any frontend framework.
-* The UI is professional, responsive, and consistent.
-* Users can add a valid website URL.
-* Users can upload supported documents.
-* Invalid URLs and files are rejected correctly.
-* Source content is extracted and cleaned.
-* Text is divided into meaningful chunks.
-* Embeddings are generated and stored.
-* Relevant chunks are retrieved for user questions.
-* Answers are grounded in retrieved source content.
-* The chatbot does not invent unsupported information.
-* Source references are displayed with answers.
-* Sources persist locally after restarting the backend.
-* Users can view and delete sources.
-* All important operations have loading, success, empty, and error states.
-* Backend API requests use Pydantic validation.
-* API keys remain private.
-* Tests cover validation, processing, storage, retrieval, and API behavior.
-* The application remains compact and understandable.
-* No unnecessary database, infrastructure, or frontend framework is introduced.
-
-## Important Instruction
-
-Build this as a polished, compact, portfolio-quality **RAG knowledge chatbot**, not as a generic chatbot and not as a large enterprise platform.
-
-Prioritize:
-
-1. Correct RAG behavior
-2. Strong validation
-3. Reliable source processing
-4. Professional frontend design
-5. Clear system architecture
-6. Simple local persistence
-7. Maintainable Python backend
-8. Excellent user experience
+* Sources modal opening automatically
+* Sources modal remaining open
+* Searching indicator remaining after answer completion
+* Chat layout showing unnecessary sidebar content
+* Upload modal opening incorrectly
+* Broken navigation
+* Broken responsive layouts
+* Fake data appearing
+* Existing backend functionality being disconnected
+
+The final result should look like a complete, professional AI knowledge-base/RAG SaaS product rather than a basic dashboard.

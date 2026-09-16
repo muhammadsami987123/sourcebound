@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Features &amp; How It Works · Sourcebound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3" />
+  <link rel="stylesheet" href="assets/css/marketing.css?v=3" />
+  <script>
+    window.APP_CONFIG = { BACKEND_URL: "http://127.0.0.1:8000" };
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("sourcebound:settings") || "{}");
+        if (s.theme && s.theme !== "system") document.documentElement.setAttribute("data-theme", s.theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="marketing-body" data-page="features">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="marketing-navbar">
+    <div class="marketing-container flex items-center justify-between h-16">
+      <a href="index.html" class="flex items-center gap-2.5 min-h-[44px]">
+        <span class="brand-mark w-9 h-9 text-sm">SB</span>
+        <span class="font-display font-semibold text-base" style="color:var(--ink-900)">Sourcebound</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1" aria-label="Primary">
+        <a href="index.html" class="marketing-nav-link" data-nav-key="home">Home</a>
+        <a href="features.html" class="marketing-nav-link" data-nav-key="features">Features</a>
+        <a href="features.html#how-it-works" class="marketing-nav-link" data-nav-key="how-it-works">How It Works</a>
+        <a href="about.html" class="marketing-nav-link" data-nav-key="about">About</a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-2">
+        <a href="app.html" class="btn btn-primary">
+          Get Started
+          <span data-icon="arrowRight" style="width:16px;height:16px"></span>
+        </a>
+      </div>
+
+      <button type="button" class="marketing-menu-btn md:hidden" data-marketing-menu-btn aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span data-icon="menu"></span>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="marketing-mobile-panel md:hidden" data-marketing-menu-panel hidden>
+      <nav class="marketing-container py-3 flex flex-col gap-1" aria-label="Mobile">
+        <a href="index.html" class="marketing-mobile-link" data-nav-key="home">Home</a>
+        <a href="features.html" class="marketing-mobile-link" data-nav-key="features">Features</a>
+        <a href="features.html#how-it-works" class="marketing-mobile-link" data-nav-key="how-it-works">How It Works</a>
+        <a href="about.html" class="marketing-mobile-link" data-nav-key="about">About</a>
+        <a href="app.html" class="btn btn-primary justify-center mt-2">Get Started</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Header -->
+    <section class="marketing-container py-16 md:py-20 text-center">
+      <span class="marketing-eyebrow">
+        <span data-icon="layers" style="width:14px;height:14px"></span>
+        Features &amp; How It Works
+      </span>
+      <h1 class="font-display font-semibold text-4xl md:text-5xl mt-6" style="color:var(--ink-900)">
+        Everything Sourcebound does, end to end
+      </h1>
+      <p class="text-muted text-lg max-w-2xl mx-auto mt-5">
+        From ingesting a source to answering a question with references, every step is grounded in
+        what the backend actually does — nothing here is aspirational.
+      </p>
+    </section>
+
+    <!-- Feature grid -->
+    <section class="marketing-container pb-16 md:pb-20">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="globe"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Website ingestion</h3>
+          <p class="text-muted text-sm">Add any public <code>http</code>/<code>https</code> URL. Requests enforce timeouts and response-size limits, and unsafe schemes such as <code>file://</code> or <code>javascript:</code> are rejected.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="fileText"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Document upload</h3>
+          <p class="text-muted text-sm">Upload <code>.pdf</code>, <code>.txt</code>, or <code>.md</code> files. Extension, MIME type, and size are all validated server-side before a file is trusted.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="layers"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Cleaning, normalization &amp; chunking</h3>
+          <p class="text-muted text-sm">Extracted text is cleaned and normalized, then split into configurable, overlapping chunks sized for retrieval quality.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="database"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Local embeddings &amp; storage</h3>
+          <p class="text-muted text-sm">Each chunk is embedded with an OpenAI embedding model and stored as local NumPy vectors — no external vector database.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="search"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Cosine-similarity retrieval</h3>
+          <p class="text-muted text-sm">At query time the question is embedded and compared against a source's chunks to find the top-k most relevant passages.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="chat"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Source-grounded chat</h3>
+          <p class="text-muted text-sm">The chat model answers only from the retrieved context, and returns a clear "not found in this source" reply when the context is insufficient.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="link"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Per-answer references</h3>
+          <p class="text-muted text-sm">Every answer carries a Sources button that opens the exact chunk excerpts used to ground it.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="shield"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Validated everywhere</h3>
+          <p class="text-muted text-sm">Every endpoint validates input with Pydantic and returns structured errors — never a raw stack trace or filesystem path.</p>
+        </div>
+        <div class="marketing-card card-hover p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="bolt"></span></div>
+          <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Full state coverage</h3>
+          <p class="text-muted text-sm">Loading, empty, validation-error, network-error, and backend-error states are handled throughout the interface.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works: ingestion -->
+    <section id="how-it-works" class="bg-sunken py-16 md:py-20 scroll-mt-16">
+      <div class="marketing-container">
+        <div class="text-center max-w-2xl mx-auto mb-14">
+          <span class="marketing-section-label">How it works</span>
+          <h2 class="font-display font-semibold text-3xl mt-3" style="color:var(--ink-900)">From a raw source to a searchable knowledge base</h2>
+        </div>
+        <div class="max-w-xl mx-auto space-y-10">
+          <div class="marketing-step">
+            <div class="marketing-step-connector"></div>
+            <div class="marketing-step-number">1</div>
+            <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Validation</h3>
+            <p class="text-muted text-sm">The URL or file is checked — scheme, size, extension, and MIME type — before anything is processed.</p>
+          </div>
+          <div class="marketing-step">
+            <div class="marketing-step-connector"></div>
+            <div class="marketing-step-number">2</div>
+            <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Content extraction</h3>
+            <p class="text-muted text-sm">Readable text is pulled from the webpage or document (PDF, TXT, or Markdown).</p>
+          </div>
+          <div class="marketing-step">
+            <div class="marketing-step-connector"></div>
+            <div class="marketing-step-number">3</div>
+            <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Cleaning &amp; normalization</h3>
+            <p class="text-muted text-sm">Boilerplate, whitespace, and encoding noise are cleaned up before chunking.</p>
+          </div>
+          <div class="marketing-step">
+            <div class="marketing-step-connector"></div>
+            <div class="marketing-step-number">4</div>
+            <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Chunking</h3>
+            <p class="text-muted text-sm">Text is split into overlapping chunks sized for retrieval, using configurable chunk size and overlap.</p>
+          </div>
+          <div class="marketing-step">
+            <div class="marketing-step-connector"></div>
+            <div class="marketing-step-number">5</div>
+            <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Embedding generation</h3>
+            <p class="text-muted text-sm">Each chunk is embedded with the configured OpenAI embedding model.</p>
+          </div>
+          <div class="marketing-step">
+            <div class="marketing-step-number">6</div>
+            <h3 class="font-semibold mb-1" style="color:var(--ink-900)">Ready for retrieval</h3>
+            <p class="text-muted text-sm">Embeddings are stored locally, and the source status flips to Ready in the workspace.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works: chat flow -->
+    <section class="marketing-container py-16 md:py-20">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="marketing-section-label">Then, in chat</span>
+        <h2 class="font-display font-semibold text-3xl mt-3" style="color:var(--ink-900)">Ask, retrieve, answer, cite</h2>
+      </div>
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="marketing-card p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="chat"></span></div>
+          <h3 class="font-semibold mb-1 text-sm" style="color:var(--ink-900)">1. Ask a question</h3>
+          <p class="text-muted text-sm">Pick a ready source and type a question in the composer.</p>
+        </div>
+        <div class="marketing-card p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="search"></span></div>
+          <h3 class="font-semibold mb-1 text-sm" style="color:var(--ink-900)">2. Retrieval runs</h3>
+          <p class="text-muted text-sm">A "Searching your sources…" state shows while the top-k relevant chunks are found.</p>
+        </div>
+        <div class="marketing-card p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="sparkles"></span></div>
+          <h3 class="font-semibold mb-1 text-sm" style="color:var(--ink-900)">3. Answer generated</h3>
+          <p class="text-muted text-sm">The model answers strictly from the retrieved context, or says the content isn't found.</p>
+        </div>
+        <div class="marketing-card p-6">
+          <div class="marketing-icon-tile mb-4"><span data-icon="link"></span></div>
+          <h3 class="font-semibold mb-1 text-sm" style="color:var(--ink-900)">4. Sources button</h3>
+          <p class="text-muted text-sm">A Sources button appears when references exist, opening the exact excerpts used.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Supported formats -->
+    <section class="marketing-container pb-16 md:pb-20">
+      <div class="marketing-card p-6 md:p-8">
+        <h2 class="font-display font-semibold text-2xl mb-6" style="color:var(--ink-900)">Supported source formats</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead>
+              <tr class="text-faint border-b border-subtle">
+                <th class="py-2 pr-4 font-semibold">Format</th>
+                <th class="py-2 pr-4 font-semibold">Extension</th>
+                <th class="py-2 font-semibold">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="text-muted">
+              <tr class="border-b border-subtle">
+                <td class="py-2 pr-4">Website</td>
+                <td class="py-2 pr-4"><code>http(s)://</code></td>
+                <td class="py-2">Public pages only; <code>file://</code>, <code>javascript:</code>, and <code>ftp://</code> are rejected.</td>
+              </tr>
+              <tr class="border-b border-subtle">
+                <td class="py-2 pr-4">PDF</td>
+                <td class="py-2 pr-4"><code>.pdf</code></td>
+                <td class="py-2">Text-based PDFs; scanned/image-only PDFs may extract no text.</td>
+              </tr>
+              <tr class="border-b border-subtle">
+                <td class="py-2 pr-4">Plain text</td>
+                <td class="py-2 pr-4"><code>.txt</code></td>
+                <td class="py-2">UTF-8 encoded.</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4">Markdown</td>
+                <td class="py-2 pr-4"><code>.md</code></td>
+                <td class="py-2">Headings preserved where possible.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="marketing-container pb-16 md:pb-24">
+      <div class="marketing-cta-band p-10 md:p-14 text-center">
+        <h2 class="font-display font-semibold text-3xl md:text-4xl mb-3">See it work on your own source</h2>
+        <p class="max-w-xl mx-auto mb-8" style="color:var(--brand-100)">
+          Add a website or document in the workspace and ask it a question.
+        </p>
+        <a href="app.html" class="btn text-base px-6 py-3" style="background:#fff;color:var(--brand-700)">
+          Open Workspace
+          <span data-icon="arrowRight" style="width:18px;height:18px"></span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="marketing-footer">
+    <div class="marketing-container py-12 grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="md:col-span-1">
+        <a href="index.html" class="flex items-center gap-2.5 mb-3">
+          <span class="brand-mark w-8 h-8 text-xs">SB</span>
+          <span class="font-display font-semibold" style="color:var(--ink-900)">Sourcebound</span>
+        </a>
+        <p class="text-muted text-sm">A compact, source-grounded RAG chatbot.</p>
+      </div>
+      <div>
+        <p class="marketing-footer-heading mb-3">Product</p>
+        <div class="flex flex-col items-start">
+          <a href="index.html" class="marketing-footer-link">Home</a>
+          <a href="features.html" class="marketing-footer-link">Features</a>
+          <a href="features.html#how-it-works" class="marketing-footer-link">How It Works</a>
+          <a href="about.html" class="marketing-footer-link">About</a>
+        </div>
+      </div>
+      <div>
+        <p class="marketing-footer-heading mb-3">Workspace</p>
+        <div class="flex flex-col items-start">
+          <a href="app.html" class="marketing-footer-link">Open Workspace</a>
+          <a href="sources.html" class="marketing-footer-link">Sources</a>
+          <a href="chat.html" class="marketing-footer-link">Chat</a>
+          <a href="settings.html" class="marketing-footer-link">Settings</a>
+        </div>
+      </div>
+      <div>
+        <p class="marketing-footer-heading mb-3">Project</p>
+        <div class="flex flex-col items-start">
+          <a href="https://github.com/muhammadsami987123/sourcebound" class="marketing-footer-link" target="_blank" rel="noopener noreferrer">GitHub repository</a>
+        </div>
+      </div>
+    </div>
+    <div class="marketing-container py-5 border-t border-subtle text-faint text-xs">
+      Sourcebound — a portfolio-quality Retrieval-Augmented Generation chatbot.
+    </div>
+  </footer>
+
+  <script src="assets/js/marketing.js?v=3"></script>
+</body>
+</html>

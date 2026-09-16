@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sources · Sourcebound</title>
+  <title>Search · Sourcebound</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -25,33 +25,23 @@
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
       <header id="topbar-root"></header>
       <main id="main-content" class="flex-1 px-4 md:px-8 py-6 md:py-8 overflow-y-auto">
-        <div class="max-w-7xl mx-auto w-full space-y-6">
-
-          <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="min-w-0">
-              <h1 class="font-display text-xl md:text-2xl font-semibold">Sources</h1>
-              <p class="text-sm text-muted mt-1">Manage the websites and documents Sourcebound can answer questions about.</p>
-            </div>
-            <button type="button" id="add-source-btn" class="btn btn-primary flex-none">
-            </button>
-          </section>
+        <div class="max-w-4xl mx-auto w-full space-y-6">
 
           <section class="card p-4 md:p-5">
-            <div id="filter-slot" class="mb-4"></div>
-            <div id="sources-list"></div>
+            <div id="search-form-slot"></div>
           </section>
+
+          <section id="search-results-slot" class="space-y-3"></section>
 
         </div>
       </main>
     </div>
   </div>
 
-  <div id="modal-root"></div>
-
   <script src="assets/js/api.js?v=3"></script>
   <script src="assets/js/components.js?v=3"></script>
   <script src="assets/js/navigation.js?v=3"></script>
   <script src="assets/js/app.js?v=3"></script>
-  <script src="assets/js/sources.js?v=3"></script>
+  <script src="assets/js/search.js?v=3"></script>
 </body>
 </html>

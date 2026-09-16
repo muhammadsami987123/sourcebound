@@ -10,7 +10,7 @@
     active: "settings",
     title: "Settings",
     description: "Lightweight preferences for how Sourcebound looks and answers.",
-    breadcrumb: [{ label: "Dashboard", href: "dashboard.html" }, { label: "Settings" }],
+    breadcrumb: [{ label: "Workspace", href: "app.html" }, { label: "Settings" }],
   });
 
   const themeSelect = document.getElementById("theme-select");

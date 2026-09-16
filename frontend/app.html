@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workspace · Sourcebound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=3" />
+  <script>
+    window.APP_CONFIG = { BACKEND_URL: "http://127.0.0.1:8000" };
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("sourcebound:settings") || "{}");
+        if (s.theme && s.theme !== "system") document.documentElement.setAttribute("data-theme", s.theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="bg-canvas">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div id="modal-root"></div>
+  <div class="app-shell flex overflow-hidden">
+    <div id="sidebar-root"></div>
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      <header id="topbar-root"></header>
+      <main id="main-content" class="flex-1 px-4 md:px-8 py-6 md:py-8 overflow-y-auto" tabindex="-1">
+        <div class="max-w-7xl mx-auto w-full space-y-8">
+
+          <section class="card p-6 md:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div class="max-w-xl">
+              <p class="text-xs font-semibold uppercase tracking-wide text-[var(--brand-600)]">Knowledge workspace</p>
+              <h1 class="font-display text-2xl md:text-3xl font-semibold mt-1.5">Welcome back</h1>
+              <p class="text-sm text-muted mt-2 leading-relaxed">
+                Add a website or document, let Sourcebound read and index it, then ask questions and get
+                answers grounded in that source — with references back to exactly where they came from.
+              </p>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap flex-none">
+              <button type="button" class="btn btn-secondary" id="qa-add-source"></button>
+              <button type="button" class="btn btn-secondary" id="qa-upload-document"></button>
+              <a href="chat.html" class="btn btn-primary" id="qa-start-chat"></a>
+            </div>
+          </section>
+
+          <section aria-labelledby="metrics-heading">
+            <h2 id="metrics-heading" class="sr-only">Workspace metrics</h2>
+            <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"></div>
+          </section>
+
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <section class="card p-6 xl:col-span-2">
+              <div class="flex items-center justify-between mb-4 gap-3">
+                <div>
+                  <h2 class="font-display text-base font-semibold">Recent sources</h2>
+                  <p class="text-sm text-muted mt-0.5">The latest websites and documents added to your knowledge base.</p>
+                </div>
+                <a href="sources.html" class="text-sm font-medium text-[var(--brand-600)] hover:underline flex-none">View all</a>
+              </div>
+              <div id="recent-sources"></div>
+            </section>
+
+            <div class="flex flex-col gap-6">
+              <section class="card p-6">
+                <h2 class="font-display text-base font-semibold mb-0.5">Indexing activity</h2>
+                <p class="text-sm text-muted mb-4">Sources currently being processed.</p>
+                <div id="indexing-activity"></div>
+              </section>
+
+              <section class="card p-6">
+                <h2 class="font-display text-base font-semibold mb-0.5">Recent questions</h2>
+                <p class="text-sm text-muted mb-4">Your latest questions from this browser.</p>
+                <div id="recent-questions"></div>
+              </section>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js?v=3"></script>
+  <script src="assets/js/components.js?v=3"></script>
+  <script src="assets/js/navigation.js?v=3"></script>
+  <script src="assets/js/app.js?v=3"></script>
+  <script>
+    (function () {
+      Nav.render({
+        active: "dashboard",
+        title: "Workspace",
+        description: "An overview of your knowledge base and quick actions.",
+        breadcrumb: [{ label: "Workspace" }],
+      });
+
+      const statsGrid = document.getElementById("stats-grid");
+      const recentWrap = document.getElementById("recent-sources");
+      const indexingWrap = document.getElementById("indexing-activity");
+      const questionsWrap = document.getElementById("recent-questions");
+
+      const addSourceBtn = document.getElementById("qa-add-source");
+      const uploadDocBtn = document.getElementById("qa-upload-document");
+      const startChatBtn = document.getElementById("qa-start-chat");
+
+      addSourceBtn.replaceChildren(UI.icon("plus"), document.createTextNode("Add source"));
+      uploadDocBtn.replaceChildren(UI.icon("upload"), document.createTextNode("Upload document"));
+      startChatBtn.replaceChildren(UI.icon("chat"), document.createTextNode("Start chat"));
+
+      function openAddSource() {
+        UI.addSourceModal({ onAdded: () => load() });
+      }
+      addSourceBtn.addEventListener("click", openAddSource);
+      uploadDocBtn.addEventListener("click", openAddSource);
+
+      let currentSources = [];
+
+      function renderStatsSkeleton() {
+        statsGrid.innerHTML = "";
+        for (let i = 0; i < 6; i++) statsGrid.appendChild(UI.skeletonCard());
+      }
+
+      function renderStats(sources) {
+        const total = sources.length;
+        const ready = sources.filter((s) => s.status === "ready").length;
+        const processing = sources.filter((s) => s.status === "processing" || s.status === "pending").length;
+        const failed = sources.filter((s) => s.status === "failed").length;
+        const websites = sources.filter((s) => s.type === "website").length;
+        const documents = sources.filter((s) => s.type === "pdf" || s.type === "txt" || s.type === "md").length;
+
+        statsGrid.innerHTML = "";
+        statsGrid.appendChild(UI.statCard({ label: "Total sources", value: total, icon: "layers" }));
+        statsGrid.appendChild(UI.statCard({ label: "Ready", value: ready, icon: "check", tone: "success" }));
+        statsGrid.appendChild(UI.statCard({ label: "Processing", value: processing, icon: "clock", tone: "warning" }));
+        statsGrid.appendChild(UI.statCard({ label: "Failed", value: failed, icon: "warning", tone: "error" }));
+        statsGrid.appendChild(UI.statCard({ label: "Documents", value: documents, icon: "file" }));
+        statsGrid.appendChild(UI.statCard({ label: "Websites", value: websites, icon: "globe" }));
+      }
+
+      function renderRecent(sources) {
+        recentWrap.innerHTML = "";
+        if (!sources.length) {
+          recentWrap.appendChild(
+            UI.emptyState({
+              icon: "inbox",
+              title: "No sources yet",
+              message: "Add a website URL or upload a document to start building your knowledge base.",
+              actionLabel: "Add your first source",
+              onAction: openAddSource,
+            })
+          );
+          return;
+        }
+        const recent = [...sources]
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          .slice(0, 6);
+        const grid = UI.el("div", { class: "grid grid-cols-1 md:grid-cols-2 gap-4" });
+        recent.forEach((source) => {
+          grid.appendChild(
+            UI.sourceCard(source, {
+              onOpenChat: (s) => (window.location.href = `chat.html?source=${encodeURIComponent(s.id)}`),
+              onViewDetails: (s) => (window.location.href = `source-details.html?id=${encodeURIComponent(s.id)}`),
+              onDelete: (s) =>
+                UI.confirmModal({
+                  title: "Delete this source?",
+                  message: `"${s.title}" and all of its chunks will be permanently removed.`,
+                  confirmLabel: "Delete",
+                  danger: true,
+                  onConfirm: async () => {
+                    try {
+                      await Api.deleteSource(s.id);
+                      UI.toast("Source deleted.", "success");
+                      load();
+                    } catch (err) {
+                      UI.toast(err.message || "Could not delete this source.", "error");
+                    }
+                  },
+                }),
+            })
+          );
+        });
+        recentWrap.appendChild(grid);
+      }
+
+      function renderIndexing(sources) {
+        indexingWrap.innerHTML = "";
+        const active = sources.filter((s) => s.status === "processing" || s.status === "pending");
+        if (!active.length) {
+          indexingWrap.appendChild(
+            UI.emptyState({
+              icon: "clock",
+              title: "Nothing processing",
+              message: "New sources will appear here while they are being indexed.",
+            })
+          );
+          return;
+        }
+        const list = UI.el("div", { class: "flex flex-col gap-3" });
+        active.forEach((source) => {
+          const typeMeta = UI.sourceTypeMeta(source.type);
+          list.appendChild(
+            UI.el("div", { class: "flex items-center gap-3 rounded-xl border border-subtle bg-sunken p-3" }, [
+              UI.el("span", { class: "w-8 h-8 rounded-lg bg-surface flex items-center justify-center text-[var(--brand-600)] flex-none" }, [UI.icon(typeMeta.icon)]),
+              UI.el("div", { class: "min-w-0 flex-1" }, [
+                UI.el("p", { class: "text-sm font-medium truncate" }, [source.title || typeMeta.label]),
+                UI.el("p", { class: "text-xs text-faint mt-0.5" }, [UI.relativeTime(source.created_at)]),
+              ]),
+              UI.statusBadge(source.status),
+            ])
+          );
+        });
+        indexingWrap.appendChild(list);
+      }
+
+      function renderQuestions(sources) {
+        questionsWrap.innerHTML = "";
+        const conversations = App.getConversations() || {};
+        const entries = [];
+        Object.keys(conversations).forEach((sourceId) => {
+          const conv = conversations[sourceId];
+          if (!conv || !Array.isArray(conv.messages)) return;
+          const userMessages = conv.messages.filter((m) => m.role === "user" && m.text);
+          const last = userMessages[userMessages.length - 1];
+          if (!last) return;
+          const source = sources.find((s) => s.id === sourceId);
+          entries.push({ text: last.text, timestamp: last.timestamp, sourceId, sourceTitle: source ? source.title : null });
+        });
+        entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        const recent = entries.slice(0, 5);
+
+        if (!recent.length) {
+          questionsWrap.appendChild(
+            UI.emptyState({
+              icon: "chat",
+              title: "No questions yet",
+              message: "Questions you ask in Chat will show up here.",
+              actionLabel: "Start chat",
+              onAction: () => (window.location.href = "chat.html"),
+            })
+          );
+          return;
+        }
+
+        const list = UI.el("div", { class: "flex flex-col gap-3" });
+        recent.forEach((entry) => {
+          list.appendChild(
+            UI.el("a", {
+              href: `chat.html?source=${encodeURIComponent(entry.sourceId)}`,
+              class: "block rounded-xl border border-subtle p-3 hover:border-[var(--brand-600)] transition-colors",
+            }, [
+              UI.el("p", { class: "text-sm font-medium line-clamp-2" }, [entry.text]),
+              UI.el("p", { class: "text-xs text-faint mt-1.5" }, [
+                entry.sourceTitle ? `${entry.sourceTitle} · ${UI.relativeTime(entry.timestamp)}` : UI.relativeTime(entry.timestamp),
+              ]),
+            ])
+          );
+        });
+        questionsWrap.appendChild(list);
+      }
+
+      async function load() {
+        renderStatsSkeleton();
+        recentWrap.innerHTML = "";
+        recentWrap.appendChild(UI.loadingIndicator("Loading your knowledge base…"));
+        indexingWrap.innerHTML = "";
+        indexingWrap.appendChild(UI.loadingIndicator("Loading activity…"));
+        try {
+          const data = await Api.listSources();
+          currentSources = (data && data.sources) || [];
+          renderStats(currentSources);
+          renderRecent(currentSources);
+          renderIndexing(currentSources);
+          renderQuestions(currentSources);
+        } catch (err) {
+          statsGrid.innerHTML = "";
+          recentWrap.innerHTML = "";
+          indexingWrap.innerHTML = "";
+          questionsWrap.innerHTML = "";
+          const message =
+            err.kind === "network"
+              ? "The backend could not be reached. Start the API server and try again."
+              : err.message || "Something went wrong while loading your sources.";
+          recentWrap.appendChild(UI.errorAlert({ title: "Could not load dashboard data", message, onRetry: load }));
+        }
+      }
+
+      load();
+    })();
+  </script>
+</body>
+</html>

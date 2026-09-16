@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=2" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=3" />
   <script>
     window.APP_CONFIG = { BACKEND_URL: "http://127.0.0.1:8000" };
     (function () {
@@ -20,11 +20,13 @@
   </script>
 </head>
 <body class="bg-canvas">
-  <div class="flex h-screen overflow-hidden">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div id="modal-root"></div>
+  <div class="app-shell flex overflow-hidden">
     <div id="sidebar-root"></div>
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
       <header id="topbar-root"></header>
-      <main class="flex-1 px-4 md:px-8 py-6 md:py-8 overflow-y-auto">
+      <main id="main-content" class="flex-1 px-4 md:px-8 py-6 md:py-8 overflow-y-auto" tabindex="-1">
         <div class="max-w-5xl mx-auto w-full">
           <div id="details-root"></div>
         </div>
@@ -32,10 +34,10 @@
     </div>
   </div>
 
-  <script src="assets/js/api.js?v=2"></script>
-  <script src="assets/js/components.js?v=2"></script>
-  <script src="assets/js/navigation.js?v=2"></script>
-  <script src="assets/js/app.js?v=2"></script>
+  <script src="assets/js/api.js?v=3"></script>
+  <script src="assets/js/components.js?v=3"></script>
+  <script src="assets/js/navigation.js?v=3"></script>
+  <script src="assets/js/app.js?v=3"></script>
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
@@ -46,7 +48,7 @@
         active: "sources",
         title: "Source details",
         description: sourceId ? `Reviewing source ${sourceId}` : "No source selected",
-        breadcrumb: [{ label: "Dashboard", href: "dashboard.html" }, { label: "Sources", href: "sources.html" }, { label: "Details" }],
+        breadcrumb: [{ label: "Workspace", href: "app.html" }, { label: "Sources", href: "sources.html" }, { label: "Details" }],
       });
 
       function fieldRow(label, value) {
@@ -59,6 +61,7 @@
       async function load() {
         root.innerHTML = "";
         if (!sourceId) {
+          root.appendChild(UI.el("h1", { class: "sr-only" }, ["Source details"]));
           root.appendChild(
             UI.emptyState({
               icon: "search",
@@ -78,6 +81,7 @@
           source = await Api.getSource(sourceId);
         } catch (err) {
           root.innerHTML = "";
+          root.appendChild(UI.el("h1", { class: "sr-only" }, ["Source details"]));
           const message =
             err.kind === "notfound"
               ? "This source could not be found. It may have been deleted."
@@ -106,7 +110,7 @@
           UI.el("div", { class: "flex items-start gap-3 min-w-0" }, [
             UI.el("div", { class: "w-11 h-11 rounded-xl bg-sunken flex items-center justify-center text-[var(--brand-600)] flex-none" }, [UI.icon(typeMeta.icon)]),
             UI.el("div", { class: "min-w-0" }, [
-              UI.el("h2", { class: "font-display text-xl font-semibold break-words" }, [source.title || "Untitled source"]),
+              UI.el("h1", { class: "font-display text-xl font-semibold break-words" }, [source.title || "Untitled source"]),
               UI.el("p", { class: "text-sm text-muted mt-1 break-words" }, [source.origin || ""]),
               UI.el("div", { class: "mt-2" }, [UI.statusBadge(source.status)]),
             ]),

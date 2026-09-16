@@ -2,16 +2,41 @@
  * chat.js — Chat page: source selection, sending messages, rendering
  * history and references, and clear-chat. All network calls go through
  * Api (api.js); all rendering goes through UI (components.js).
+ *
+ * State-machine notes (see task.md sections 9, 10, 17):
+ *  - thinkingIndicator: created right before the Api.chat() call, its
+ *    destroy() is called in a `finally` block, so it is removed on success,
+ *    error and abort alike. There is exactly one indicator instance per
+ *    in-flight request (guarded by `activeIndicator`).
+ *  - sources modal: never constructed until the user clicks a
+ *    UI.sourcesButton. No render path opens it implicitly.
  */
 (function () {
   "use strict";
+
+  if (document.body.firstChild) {
+    document.body.insertBefore(UI.skipLink("main-content"), document.body.firstChild);
+  }
 
   Nav.render({
     active: "chat",
     title: "Chat",
     description: "Ask questions about a ready source and get grounded, referenced answers.",
-    breadcrumb: [{ label: "Dashboard", href: "dashboard.html" }, { label: "Chat" }],
+    breadcrumb: [{ label: "Workspace", href: "app.html" }, { label: "Chat" }],
   });
+
+  // The chat page is a dedicated conversation surface: the full app sidebar
+  // would constrain the available width, so collapse it to icons on desktop.
+  // This is a page-local, non-persisted presentation choice — it does not
+  // touch the user's saved sidebar preference used on other pages.
+  (function collapseSidebarForChat() {
+    const sidebarRoot = document.getElementById("sidebar-root");
+    if (!sidebarRoot) return;
+    sidebarRoot.classList.remove("is-hidden-desktop");
+    sidebarRoot.classList.add("is-collapsed");
+    const openBtn = document.querySelector(".sidebar-open-btn");
+    if (openBtn) openBtn.classList.add("hidden");
+  })();
 
   const sourceSelect = document.getElementById("source-select");
   const sourceTypeIcon = document.getElementById("source-type-icon");
@@ -46,7 +71,7 @@
 
   function autoResize() {
     input.style.height = "auto";
-    input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
+    input.style.height = `${Math.min(input.scrollHeight, 200)}px`;
   }
 
   function renderProcessingNotice() {
@@ -94,7 +119,7 @@
       emptyWrap.appendChild(
         UI.emptyState({
           icon: "chat",
-          title: "Choose a source to begin",
+          title: "Ask your knowledge base anything",
           message: "Select a ready source above, then ask a question to get a grounded answer with references.",
         })
       );
@@ -110,8 +135,8 @@
       emptyWrap.appendChild(
         UI.emptyState({
           icon: "chat",
-          title: "Ask your first question",
-          message: `Try something like "What is ${selectedSource.title || "this source"} about?" — answers are grounded in the source content, with references below each reply.`,
+          title: "Ask your knowledge base anything",
+          message: `Answers are grounded in "${selectedSource.title || "this source"}" only, with references you can open below each reply.`,
         })
       );
       const chips = [
@@ -119,7 +144,7 @@
         "What are the key points?",
         "Are there any important dates or numbers mentioned?",
       ];
-      const chipWrap = UI.el("div", { class: "flex flex-wrap items-center justify-center gap-2 -mt-6 mb-4" });
+      const chipWrap = UI.el("div", { class: "flex flex-wrap items-center justify-center gap-2 mt-5 mb-4" });
       chips.forEach((c) => chipWrap.appendChild(UI.suggestionChip(c, (text) => {
         input.value = text;
         autoResize();
@@ -140,8 +165,11 @@
         pending: message.pending,
       });
       if (message.role === "assistant" && !message.pending && message.references && message.references.length) {
+        // Sources modal is only ever constructed inside this onClick handler —
+        // never on render, never on load. isSourcesModalOpen effectively stays
+        // false until the user actually clicks this button.
         const sourcesBtn = UI.sourcesButton(message.references.length, () => {
-          UI.referencesModal({ title: "Sources for this answer", references: message.references });
+          UI.sourcesModal({ title: `Sources (${message.references.length})`, references: message.references });
         });
         row.lastElementChild.appendChild(sourcesBtn);
       }
@@ -219,9 +247,7 @@
     if (!selectedSource || selectedSource.status !== "ready") return;
 
     const userMessage = { id: genId("msg"), role: "user", text, timestamp: new Date().toISOString() };
-    const pendingId = genId("msg");
     conversation.messages.push(userMessage);
-    conversation.messages.push({ id: pendingId, role: "assistant", text: "", pending: true, timestamp: new Date().toISOString() });
     renderMessages();
     persist();
 
@@ -230,6 +256,24 @@
     errorSlot.innerHTML = "";
 
     const settings = App.getSettings();
+
+    // Thinking/searching indicator: created immediately, destroyed in
+    // `finally` so it can never survive success, error, or abort. It is
+    // appended into the message list (as a temporary node, not a persisted
+    // conversation message) so it scrolls with the conversation.
+    const indicator = UI.thinkingIndicator();
+    indicator.setPhase("thinking");
+    messagesWrap.appendChild(indicator.node);
+    scrollArea.scrollTop = scrollArea.scrollHeight;
+
+    let searchingTimer = window.setTimeout(() => {
+      // Retrieval genuinely happens server-side as part of this single
+      // request; we don't get a separate "retrieval started" event, so the
+      // best honest signal available client-side is "the request is still
+      // in flight past the first moment" — flip to "searching" once, and
+      // only while the request is still outstanding.
+      if (requestInFlight) indicator.setPhase("searching");
+    }, 500);
 
     try {
       const response = await Api.chat({
@@ -244,20 +288,16 @@
       const references = (response && response.references) || [];
       if (response && response.conversation_id) conversation.id = response.conversation_id;
 
-      const idx = conversation.messages.findIndex((m) => m.id === pendingId);
-      if (idx !== -1) {
-        conversation.messages[idx] = {
-          id: pendingId,
-          role: "assistant",
-          text: answer,
-          references,
-          timestamp: new Date().toISOString(),
-        };
-      }
+      conversation.messages.push({
+        id: genId("msg"),
+        role: "assistant",
+        text: answer,
+        references,
+        timestamp: new Date().toISOString(),
+      });
       renderMessages();
       persist();
     } catch (err) {
-      conversation.messages = conversation.messages.filter((m) => m.id !== pendingId);
       renderMessages();
       persist();
 
@@ -280,8 +320,11 @@
       );
       UI.toast(message, "error");
     } finally {
+      window.clearTimeout(searchingTimer);
+      indicator.destroy();
       requestInFlight = false;
       updateSendState();
+      input.focus();
     }
   }
 
