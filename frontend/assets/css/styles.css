@@ -173,13 +173,40 @@ h1, h2, h3, h4, .font-display {
 }
 
 /* ---------- Surfaces & shell ---------- */
+/* Structural layout (position, size, off-canvas transform) lives here as
+   plain CSS rather than as Tailwind utility classes assigned by JS. This
+   sidebar is built entirely in navigation.js and every page navigation is a
+   full reload (static multi-page app, no client router) — if the layout came
+   from Tailwind utilities, the Play CDN's runtime scanner would need to
+   observe the JS-inserted markup and inject matching CSS asynchronously,
+   so the sidebar painted unstyled for a frame and then visibly jumped into
+   place on every single click. Defining it here means it is correct from
+   this stylesheet's first parse, before any JS has run. */
 .app-sidebar {
   background: var(--surface);
   border-right: 1px solid var(--border-subtle);
   overflow: hidden;
+  position: fixed;
+  inset-block: 0;
+  left: 0;
+  z-index: 40;
+  width: 16rem;
+  padding: 1.25rem;
+  transform: translateX(-100%);
+}
+.app-sidebar.is-transitions-ready {
+  transition: transform 0.2s ease, width 0.2s ease, opacity 0.2s ease;
+}
+.app-sidebar.is-mobile-open {
+  transform: translateX(0);
 }
 
 @media (min-width: 1024px) {
+  .app-sidebar {
+    position: static;
+    z-index: auto;
+    transform: none;
+  }
   .app-sidebar.is-hidden-desktop {
     width: 0 !important;
     padding-left: 0 !important;

@@ -301,8 +301,22 @@
     let triggerBeforeOpen = null;
     let trapHandler = null;
 
+    // Read the saved collapse/hidden preference up front and bake it into the
+    // very first className assignment below, WITHOUT the transition classes.
+    // Applying it correctly from the start (rather than rendering expanded and
+    // then adding "is-collapsed" a moment later via applyDesktopState) avoids
+    // a visible collapse/expand animation replaying on every page load, since
+    // this is a static multi-page app where every nav click is a full reload.
+    const initialSidebarState = getSidebarPref();
+    const initialStateClass =
+      initialSidebarState === "collapsed" ? " is-collapsed" :
+      initialSidebarState === "closed" ? " is-hidden-desktop" : "";
+
     if (sidebarRoot) {
-      sidebarRoot.className = "app-sidebar fixed inset-y-0 left-0 z-40 w-64 p-5 -translate-x-full transition-all duration-200 lg:translate-x-0 lg:static lg:z-auto";
+      // Structural layout (position/width/off-canvas transform) comes from
+      // the plain-CSS .app-sidebar rules in styles.css, not Tailwind utility
+      // classes — see the comment above that rule for why.
+      sidebarRoot.className = "app-sidebar" + initialStateClass;
       sidebarRoot.innerHTML = "";
       sidebarRoot.setAttribute("role", "navigation");
       sidebarRoot.setAttribute("aria-label", "Sidebar");
@@ -311,6 +325,13 @@
       closeBtn = built.closeBtn;
       collapseBtn = built.collapseBtn;
       addSourceBtn = built.addSourceBtn;
+
+      // Only now, after the correct initial state has already painted, turn on
+      // the transition so later user-triggered toggles (collapse, mobile open/
+      // close) animate smoothly without affecting this first render.
+      requestAnimationFrame(() => {
+        sidebarRoot.classList.add("is-transitions-ready");
+      });
     }
 
     let overlay = document.getElementById("sidebar-overlay");
@@ -335,7 +356,7 @@
     }
 
     function closeMobileSidebar() {
-      sidebarRoot.classList.add("-translate-x-full");
+      sidebarRoot.classList.remove("is-mobile-open");
       overlay.classList.add("hidden");
       if (trapHandler) {
         sidebarRoot.removeEventListener("keydown", trapHandler);
@@ -349,7 +370,7 @@
 
     function openMobileSidebar() {
       triggerBeforeOpen = document.activeElement;
-      sidebarRoot.classList.remove("-translate-x-full");
+      sidebarRoot.classList.add("is-mobile-open");
       overlay.classList.remove("hidden");
       trapHandler = trapFocus;
       sidebarRoot.addEventListener("keydown", trapHandler);
@@ -358,7 +379,7 @@
     }
 
     function toggleMobileSidebar() {
-      const isOpen = !sidebarRoot.classList.contains("-translate-x-full");
+      const isOpen = sidebarRoot.classList.contains("is-mobile-open");
       if (isOpen) closeMobileSidebar();
       else openMobileSidebar();
     }
@@ -375,7 +396,7 @@
     }
 
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !sidebarRoot.classList.contains("-translate-x-full") && window.innerWidth < 1024) {
+      if (event.key === "Escape" && sidebarRoot.classList.contains("is-mobile-open") && window.innerWidth < 1024) {
         closeMobileSidebar();
       }
     });
@@ -397,8 +418,10 @@
       }
     }
 
-    const initialState = getSidebarPref();
-    applyDesktopState(initialState);
+    // Reuses initialSidebarState computed above — the sidebar's own classList
+    // already reflects it; this call only needs to run for the openBtn
+    // hidden/shown side effect.
+    applyDesktopState(initialSidebarState);
 
     if (collapseBtn) {
       collapseBtn.onclick = () => {
