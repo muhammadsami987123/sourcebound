@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Source details · Sourcebound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=2" />
+  <script>
+    window.APP_CONFIG = { BACKEND_URL: "http://127.0.0.1:8000" };
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("sourcebound:settings") || "{}");
+        if (s.theme && s.theme !== "system") document.documentElement.setAttribute("data-theme", s.theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="bg-canvas">
+  <div class="flex h-screen overflow-hidden">
+    <div id="sidebar-root"></div>
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      <header id="topbar-root"></header>
+      <main class="flex-1 px-4 md:px-8 py-6 md:py-8 overflow-y-auto">
+        <div class="max-w-5xl mx-auto w-full">
+          <div id="details-root"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js?v=2"></script>
+  <script src="assets/js/components.js?v=2"></script>
+  <script src="assets/js/navigation.js?v=2"></script>
+  <script src="assets/js/app.js?v=2"></script>
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const sourceId = params.get("id");
+      const root = document.getElementById("details-root");
+
+      Nav.render({
+        active: "sources",
+        title: "Source details",
+        description: sourceId ? `Reviewing source ${sourceId}` : "No source selected",
+        breadcrumb: [{ label: "Dashboard", href: "dashboard.html" }, { label: "Sources", href: "sources.html" }, { label: "Details" }],
+      });
+
+      function fieldRow(label, value) {
+        return UI.el("div", { class: "flex flex-col gap-1 py-3 border-b border-subtle last:border-b-0" }, [
+          UI.el("span", { class: "text-xs font-semibold uppercase tracking-wide text-faint" }, [label]),
+          UI.el("span", { class: "text-sm text-[var(--ink-900)] break-words" }, [value === undefined || value === null || value === "" ? "—" : String(value)]),
+        ]);
+      }
+
+      async function load() {
+        root.innerHTML = "";
+        if (!sourceId) {
+          root.appendChild(
+            UI.emptyState({
+              icon: "search",
+              title: "No source selected",
+              message: "Open a source from the Sources page to see its details here.",
+              actionLabel: "Go to Sources",
+              onAction: () => (window.location.href = "sources.html"),
+            })
+          );
+          return;
+        }
+
+        root.appendChild(UI.loadingIndicator("Loading source details…"));
+
+        let source;
+        try {
+          source = await Api.getSource(sourceId);
+        } catch (err) {
+          root.innerHTML = "";
+          const message =
+            err.kind === "notfound"
+              ? "This source could not be found. It may have been deleted."
+              : err.kind === "network"
+              ? "The backend could not be reached. Start the API server and try again."
+              : err.message || "Something went wrong while loading this source.";
+          root.appendChild(UI.errorAlert({ title: "Could not load source", message, onRetry: load }));
+          return;
+        }
+
+        let chunks = [];
+        let chunksError = null;
+        try {
+          const chunkData = await Api.getChunks(sourceId);
+          chunks = (chunkData && chunkData.chunks) || [];
+        } catch (err) {
+          chunksError = err.message || "Could not load chunk previews.";
+        }
+
+        root.innerHTML = "";
+        document.title = `${source.title || "Source"} · Sourcebound`;
+
+        const typeMeta = UI.sourceTypeMeta(source.source_type);
+
+        const header = UI.el("div", { class: "card p-6 flex flex-col md:flex-row md:items-start md:justify-between gap-5" }, [
+          UI.el("div", { class: "flex items-start gap-3 min-w-0" }, [
+            UI.el("div", { class: "w-11 h-11 rounded-xl bg-sunken flex items-center justify-center text-[var(--brand-600)] flex-none" }, [UI.icon(typeMeta.icon)]),
+            UI.el("div", { class: "min-w-0" }, [
+              UI.el("h2", { class: "font-display text-xl font-semibold break-words" }, [source.title || "Untitled source"]),
+              UI.el("p", { class: "text-sm text-muted mt-1 break-words" }, [source.origin || ""]),
+              UI.el("div", { class: "mt-2" }, [UI.statusBadge(source.status)]),
+            ]),
+          ]),
+          UI.el("div", { class: "flex items-center gap-2 flex-none" }, [
+            UI.el("button", {
+              class: "btn btn-primary",
+              disabled: source.status !== "ready",
+              title: source.status === "ready" ? "Chat with this source" : "Source is not ready yet",
+              onclick: () => (window.location.href = `chat.html?source=${encodeURIComponent(source.id)}`),
+            }, [UI.icon("chat"), "Chat with this source"]),
+            UI.el("button", {
+              class: "icon-btn hover:text-[var(--error-600)]",
+              title: "Delete source",
+              "aria-label": "Delete source",
+              onclick: () =>
+                UI.confirmModal({
+                  title: "Delete this source?",
+                  message: `"${source.title}" and all of its chunks will be permanently removed.`,
+                  confirmLabel: "Delete",
+                  danger: true,
+                  onConfirm: async () => {
+                    try {
+                      await Api.deleteSource(source.id);
+                      UI.toast("Source deleted.", "success");
+                      window.location.href = "sources.html";
+                    } catch (err) {
+                      UI.toast(err.message || "Could not delete this source.", "error");
+                    }
+                  },
+                }),
+            }, [UI.icon("trash")]),
+          ]),
+        ]);
+        root.appendChild(header);
+
+        if (source.status === "failed" && source.error) {
+          root.appendChild(
+            UI.el("div", { class: "mt-4" }, [
+              UI.errorAlert({ title: "Processing failed", message: source.error }),
+            ])
+          );
+        }
+
+        const metaCard = UI.el("div", { class: "card p-6 mt-4" }, [
+          UI.el("h3", { class: "font-display font-semibold text-sm mb-1" }, ["Source metadata"]),
+          fieldRow("Source type", typeMeta.label),
+          fieldRow("Original URL or filename", source.origin),
+          fieldRow("Processing status", source.status),
+          fieldRow("Created", UI.formatDate(source.created_at)),
+          fieldRow("Extracted characters", UI.formatNumber(source.char_count)),
+          fieldRow("Number of chunks", UI.formatNumber(source.chunk_count)),
+        ]);
+        root.appendChild(metaCard);
+
+        const previewCard = UI.el("div", { class: "card p-6 mt-4" }, [
+          UI.el("div", { class: "flex items-center justify-between mb-3" }, [
+            UI.el("h3", { class: "font-display font-semibold text-sm" }, ["Chunk preview"]),
+            UI.el("span", { class: "text-xs text-faint" }, [`${chunks.length} of ${source.chunk_count} chunks shown`]),
+          ]),
+        ]);
+
+        if (chunksError) {
+          previewCard.appendChild(UI.errorAlert({ title: "Could not load chunk previews", message: chunksError }));
+        } else if (!chunks.length) {
+          previewCard.appendChild(
+            UI.emptyState({
+              icon: "layers",
+              title: source.status === "ready" ? "No chunks were generated" : "Chunks not available yet",
+              message:
+                source.status === "ready"
+                  ? "This source produced no retrievable content."
+                  : "Chunk previews will appear once processing finishes.",
+            })
+          );
+        } else {
+          const list = UI.el("div", { class: "space-y-3 max-h-[28rem] overflow-y-auto pr-1" });
+          chunks
+            .slice()
+            .sort((a, b) => a.chunk_index - b.chunk_index)
+            .forEach((chunk) => {
+              list.appendChild(
+                UI.el("div", { class: "rounded-xl border border-subtle bg-sunken p-4" }, [
+                  UI.el("div", { class: "flex items-center justify-between mb-1.5" }, [
+                    UI.el("span", { class: "text-xs font-semibold text-[var(--brand-600)]" }, [`Chunk #${chunk.chunk_index}`]),
+                    UI.el("span", { class: "text-[11px] text-faint" }, [`${UI.formatNumber(chunk.char_count)} characters`]),
+                  ]),
+                  UI.el("p", { class: "text-sm text-[var(--ink-700)] leading-relaxed" }, [chunk.text]),
+                ])
+              );
+            });
+          previewCard.appendChild(list);
+        }
+        root.appendChild(previewCard);
+
+        root.appendChild(
+          UI.el("p", { class: "text-xs text-faint mt-4" }, [
+            "Raw embedding vectors are stored internally and are not shown here.",
+          ])
+        );
+      }
+
+      load();
+    })();
+  </script>
+</body>
+</html>

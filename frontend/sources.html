@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sources · Sourcebound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=2" />
+  <script>
+    window.APP_CONFIG = { BACKEND_URL: "http://127.0.0.1:8000" };
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("sourcebound:settings") || "{}");
+        if (s.theme && s.theme !== "system") document.documentElement.setAttribute("data-theme", s.theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="bg-canvas">
+  <div class="flex h-screen overflow-hidden">
+    <div id="sidebar-root"></div>
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      <header id="topbar-root"></header>
+      <main class="flex-1 px-4 md:px-8 py-6 md:py-8 overflow-y-auto">
+        <div class="max-w-7xl mx-auto w-full space-y-6">
+
+          <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="card p-5">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="w-8 h-8 rounded-lg bg-sunken flex items-center justify-center text-[var(--brand-600)]" id="url-tab-icon"></span>
+                <h3 class="font-display font-semibold text-sm">Add a website URL</h3>
+              </div>
+              <div id="url-form-slot"></div>
+            </div>
+            <div class="card p-5">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="w-8 h-8 rounded-lg bg-sunken flex items-center justify-center text-[var(--brand-600)]" id="upload-tab-icon"></span>
+                <h3 class="font-display font-semibold text-sm">Upload a document</h3>
+              </div>
+              <div id="upload-form-slot"></div>
+            </div>
+          </section>
+
+          <section class="card p-5">
+            <div id="filter-slot" class="mb-5"></div>
+            <div id="sources-list"></div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js?v=2"></script>
+  <script src="assets/js/components.js?v=2"></script>
+  <script src="assets/js/navigation.js?v=2"></script>
+  <script src="assets/js/app.js?v=2"></script>
+  <script src="assets/js/sources.js?v=2"></script>
+</body>
+</html>

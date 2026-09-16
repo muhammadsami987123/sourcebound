@@ -1,0 +1,37 @@
+# Claude Code local tooling (not part of the project)
+.claude/
+
+# Environment
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Backend runtime data
+backend/data/*.json
+backend/data/embeddings/*
+backend/uploads/*
+!backend/data/.gitkeep
+!backend/data/embeddings/.gitkeep
+!backend/uploads/.gitkeep
+
+# Node (if any tooling added later)
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings · Sourcebound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=2" />
+  <script>
+    window.APP_CONFIG = { BACKEND_URL: "http://127.0.0.1:8000" };
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("sourcebound:settings") || "{}");
+        if (s.theme && s.theme !== "system") document.documentElement.setAttribute("data-theme", s.theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="bg-canvas">
+  <div class="flex h-screen overflow-hidden">
+    <div id="sidebar-root"></div>
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      <header id="topbar-root"></header>
+      <main class="flex-1 px-4 md:px-8 py-6 md:py-8 overflow-y-auto">
+        <div class="max-w-3xl mx-auto w-full space-y-5">
+
+          <section class="card p-6">
+            <h3 class="font-display font-semibold text-sm mb-1">Appearance</h3>
+            <p class="text-sm text-muted mb-4">Choose how Sourcebound looks on this device.</p>
+            <label class="field-label" for="theme-select">Theme preference</label>
+            <select id="theme-select" class="select max-w-xs">
+              <option value="system">Match system</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </section>
+
+          <section class="card p-6">
+            <h3 class="font-display font-semibold text-sm mb-1">Chat</h3>
+            <p class="text-sm text-muted mb-4">Fine-tune how answers are generated for new questions.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="field-label" for="chat-style-select">Response style</label>
+                <select id="chat-style-select" class="select">
+                  <option value="concise">Concise</option>
+                  <option value="balanced">Balanced</option>
+                  <option value="detailed">Detailed</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label" for="top-k-input">Chunks retrieved per question</label>
+                <input id="top-k-input" type="number" min="1" max="20" step="1" class="input" />
+                <p class="field-hint">How many source passages are retrieved to answer each question.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="card p-6">
+            <h3 class="font-display font-semibold text-sm mb-1">Backend connection</h3>
+            <p class="text-sm text-muted mb-4">Live status of the Sourcebound API.</p>
+            <div id="backend-status"></div>
+          </section>
+
+          <section class="card p-6">
+            <h3 class="font-display font-semibold text-sm mb-1">Local application data</h3>
+            <p class="text-sm text-muted mb-4">
+              Preferences and chat history are stored only in this browser. Clearing them does not delete
+              any sources from the backend.
+            </p>
+            <button id="clear-data-btn" class="btn btn-danger" type="button">Clear local data</button>
+          </section>
+
+          <section class="card p-6 flex items-center justify-between">
+            <div>
+              <h3 class="font-display font-semibold text-sm">Application version</h3>
+              <p class="text-sm text-muted mt-1">Sourcebound frontend</p>
+            </div>
+            <span id="app-version" class="badge badge-pending"></span>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js?v=2"></script>
+  <script src="assets/js/components.js?v=2"></script>
+  <script src="assets/js/navigation.js?v=2"></script>
+  <script src="assets/js/app.js?v=2"></script>
+  <script src="assets/js/settings.js?v=2"></script>
+</body>
+</html>
